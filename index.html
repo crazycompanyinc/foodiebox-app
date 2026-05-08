@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodieBox — Planificación de Comidas con IA | 100% Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf9f7;--bg2:#f5f3f0;--bg3:#ebe8e3;--surface:#ffffff;
+  --accent:#2d6a4f;--accent-h:#40916c;--accent-l:#b7e4c7;--accent-g:rgba(45,106,79,0.08);
+  --warm:#d4a373;--warm2:#e9c46a;--success:#52b788;
+  --t1:#1a1a1a;--t2:#5c5c5c;--t3:#8a8a8a;
+  --border:rgba(0,0,0,0.06);--border-a:rgba(45,106,79,0.15);
+  --font:'Inter',system-ui,sans-serif;--serif:'Lora',Georgia,serif;--mono:'JetBrains Mono',monospace;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.06),0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:0 12px 32px rgba(0,0,0,0.08),0 4px 8px rgba(0,0,0,0.04);
+  --r-sm:6px;--r-md:10px;--r-lg:14px;--r-xl:20px;
+}
+html{scroll-behavior:smooth;background:var(--bg);color:var(--t1);font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{overflow-x:hidden;line-height:1.65}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.container{max-width:1160px;margin:0 auto;padding:0 24px}
+.section{padding:96px 0}
+.section-title{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:600;letter-spacing:-0.01em;line-height:1.2;margin-bottom:16px}
+.section-sub{font-size:1.125rem;color:var(--t2);max-width:560px;line-height:1.65}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,0.08);color:var(--accent);border-radius:9999px;padding:4px 12px;font-size:0.75rem;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;border-radius:var(--r-md);font-weight:600;font-size:1rem;cursor:pointer;border:none;transition:all 0.3s ease;font-family:var(--font)}
+.btn-primary{background:linear-gradient(135deg,#2d6a4f 0%,#40916c 100%);color:#fff;box-shadow:0 4px 16px rgba(45,106,79,0.2)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(45,106,79,0.3)}
+.btn-secondary{background:rgba(45,106,79,0.06);color:var(--accent);border:1px solid rgba(45,106,79,0.12)}
+.btn-secondary:hover{background:rgba(45,106,79,0.1)}
+.btn-warm{background:linear-gradient(135deg,#d4a373 0%,#e9c46a 100%);color:var(--t1)}
+.card{background:#ffffff;border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;transition:all 0.3s ease;box-shadow:var(--shadow-sm)}
+.card:hover{box-shadow:var(--shadow-md);border-color:var(--border-a)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;background:rgba(250,249,247,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1160px;margin:0 auto;padding:0 24px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:1.25rem;color:var(--accent)}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#2d6a4f,#40916c);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{font-size:0.875rem;font-weight:500;color:var(--t2);transition:color 0.2s}
+.nav-links a:hover{color:var(--t1)}
+.hero{padding:140px 0 96px;position:relative}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+@media(max-width:768px){.hero-inner{grid-template-columns:1fr;gap:40px}}
+.hero h1{font-family:var(--serif);font-size:clamp(2.2rem,4.5vw,3.2rem);font-weight:600;letter-spacing:-0.02em;line-height:1.15;margin-bottom:20px}
+.hero h1 .accent{color:var(--accent)}
+.hero p{font-size:1.125rem;color:var(--t2);margin-bottom:32px;line-height:1.65}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+.weekly-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;box-shadow:var(--shadow-lg)}
+.weekly-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.weekly-header h3{font-size:0.875rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+@media(max-width:500px){.week-grid{grid-template-columns:repeat(4,1fr)}}
+.day-card{background:var(--bg2);border-radius:var(--r-md);padding:10px 6px;text-align:center;font-size:0.7rem}
+.day-card .day-name{font-weight:600;color:var(--t3);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.05em}
+.day-card .day-icon{font-size:1.25rem;margin:4px 0}
+.day-card .day-cals{font-family:var(--mono);font-size:0.65rem;color:var(--t3)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr}}
+.feature-icon{width:44px;height:44px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:12px;background:rgba(45,106,79,0.06)}
+.feature h3{font-size:1.1rem;font-weight:600;margin-bottom:6px}
+.feature p{color:var(--t2);font-size:0.9375rem;line-height:1.6}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
+@media(max-width:768px){.steps{grid-template-columns:1fr}}
+.step{text-align:center}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.step h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+.step p{color:var(--t2);font-size:0.9375rem}
+.nutrition-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-top:48px;box-shadow:var(--shadow-md)}
+.macro-row{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.macro-label{width:80px;font-size:0.8rem;font-weight:600;color:var(--t2)}
+.macro-bar{flex:1;height:6px;background:rgba(45,106,79,0.1);border-radius:9999px;overflow:hidden}
+.macro-fill{height:100%;border-radius:9999px;background:var(--accent);transition:width 1s ease}
+.macro-val{width:40px;text-align:right;font-family:var(--mono);font-size:0.8rem;font-weight:500;color:var(--t3)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+@media(max-width:768px){.pricing-grid{grid-template-columns:1fr}}
+.price-card{text-align:center;position:relative}
+.price-card.popular{border-color:var(--accent);box-shadow:0 0 30px rgba(45,106,79,0.08)}
+.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:0.65rem;font-weight:700;padding:4px 12px;border-radius:9999px;text-transform:uppercase;letter-spacing:0.05em}
+.price-amount{font-family:var(--mono);font-size:2.5rem;font-weight:500;color:var(--t1);margin:16px 0 8px}
+.price-amount span{font-size:0.875rem;color:var(--t3)}
+.price-features{list-style:none;margin:20px 0;text-align:left}
+.price-features li{padding:6px 0;color:var(--t2);font-size:0.875rem;display:flex;align-items:center;gap:8px}
+.price-features li::before{content:"✓";color:var(--success);font-weight:700;font-size:0.75rem}
+.faq{max-width:700px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;padding:18px 0;background:none;border:none;color:var(--t1);font-size:1rem;font-weight:600;font-family:var(--font);cursor:pointer;display:flex;justify-content:space-between;align-items:center;text-align:left}
+.faq-q::after{content:"+";font-size:1.125rem;color:var(--t3);transition:transform 0.3s}
+.faq-q.active::after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.3s ease;color:var(--t2);font-size:0.9375rem;line-height:1.65}
+.faq-a.open{padding-bottom:18px}
+.cta-section{text-align:center;background:linear-gradient(135deg,rgba(45,106,79,0.06) 0%,rgba(64,145,108,0.03) 100%);border-radius:var(--r-xl);padding:72px 40px;border:1px solid rgba(45,106,79,0.1)}
+.footer{border-top:1px solid var(--border);padding:40px 0;font-size:0.8rem;color:var(--t3)}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:768px){.section{padding:64px 0}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">🥗</div>
+      FoodieBox
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">Cómo funciona</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Precios</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#" class="btn btn-primary" style="padding:8px 20px;font-size:0.875rem">Empezar Gratis</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="badge" style="margin-bottom:16px">🌱 100% Digital — Planificación IA</div>
+        <h1>Come mejor. Vive mejor.<br><span class="accent">Todo con IA.</span></h1>
+        <p>Planificación de comidas personalizada, recetas adaptadas a tus objetivos, lista de compras automática y tracking nutricional. Tu nutricionista de IA, siempre contigo.</p>
+        <div class="hero-ctas">
+          <a href="#pricing" class="btn btn-primary">Empezar Gratis →</a>
+          <a href="#how" class="btn btn-secondary">Ver cómo funciona</a>
+        </div>
+      </div>
+      <div class="weekly-preview reveal">
+        <div class="weekly-header">
+          <h3>Tu plan semanal</h3>
+          <span style="font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:600">2,100 kcal/día</span>
+        </div>
+        <div class="week-grid">
+          <div class="day-card"><div class="day-name">Lun</div><div class="day-icon">🥑</div><div class="day-cals">1,950</div></div>
+          <div class="day-card"><div class="day-name">Mar</div><div class="day-icon">🍗</div><div class="day-cals">2,100</div></div>
+          <div class="day-card"><div class="day-name">Mié</div><div class="day-icon">🥗</div><div class="day-cals">1,850</div></div>
+          <div class="day-card"><div class="day-name">Jue</div><div class="day-icon">🐟</div><div class="day-cals">2,200</div></div>
+          <div class="day-card"><div class="day-name">Vie</div><div class="day-icon">🍝</div><div class="day-cals">2,150</div></div>
+          <div class="day-card"><div class="day-name">Sáb</div><div class="day-icon">🥘</div><div class="day-cals">2,300</div></div>
+          <div class="day-card"><div class="day-name">Dom</div><div class="day-icon">🍳</div><div class="day-cals">2,050</div></div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:0.75rem;color:var(--t3)">
+          <span>🔥 14,700 kcal/semana</span>
+          <span style="color:var(--accent);font-weight:600">✓ Objetivo cumplido</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how" style="background:var(--bg2)">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <span class="badge">Cómo funciona</span>
+      <h2 class="section-title">En 3 pasos simples</h2>
+      <p class="section-sub" style="margin:0 auto">La IA hace el trabajo pesado. Tú disfrutas comiendo.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h3>Define tus objetivos</h3>
+        <p>Cuéntanos tu peso, altura, objetivos y preferencias. La IA crea tu perfil nutricional.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h3>IA genera tu plan</h3>
+        <p>Recetas personalizadas, macros optimizados y plan semanal adaptado a ti.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h3>Compra y cocina</h3>
+        <p>Lista de compras automática. Recetas paso a paso. Tracking de tu progreso.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="reveal">
+      <span class="badge">Features</span>
+      <h2 class="section-title">Tu nutricionista de IA</h2>
+      <p class="section-sub">Todo lo que necesitas para comer mejor, en una app.</p>
+    </div>
+    <div class="features-grid">
+      <div class="card feature reveal">
+        <div class="feature-icon">🧠</div>
+        <h3>Planificador IA</h3>
+        <p>Genera planes semanales personalizados según tus objetivos, alergias y preferencias.</p>
+      </div>
+      <div class="card feature reveal">
+        <div class="feature-icon">📖</div>
+        <h3>Recetas Personalizadas</h3>
+        <p>Miles de recetas adaptadas a tus macros, tiempo de cocina y nivel de dificultad.</p>
+      </div>
+      <div class="card feature reveal">
+        <div class="feature-icon">🛒</div>
+        <h3>Lista de Compras</h3>
+        <p>Lista automática organizada por categorías. Exporta a tu supermercado favorito.</p>
+      </div>
+    </div>
+    <div class="features-grid" style="margin-top:24px">
+      <div class="card feature reveal">
+        <div class="feature-icon">📊</div>
+        <h3>Tracking Nutricional</h3>
+        <p>Dashboard con macros, micros, calorías y tendencias. Visualiza tu progreso.</p>
+      </div>
+      <div class="card feature reveal">
+        <div class="feature-icon">🎯</div>
+        <h3>Objetivos Inteligentes</h3>
+        <p>La IA ajusta tus objetivos según tu progreso real. Sin suposiciones.</p>
+      </div>
+      <div class="card feature reveal">
+        <div class="feature-icon">👨‍👩‍👧</div>
+        <h3>Modo Familia</h3>
+        <p>Planes para toda la familia con preferencias individuales y compras compartidas.</p>
+      </div>
+    </div>
+
+    <div class="nutrition-preview reveal">
+      <h3 style="font-size:1rem;font-weight:600;margin-bottom:20px">📊 Tu dashboard nutricional</h3>
+      <div class="macro-row"><span class="macro-label">Proteína</span><div class="macro-bar"><div class="macro-fill" style="width:78%"></div></div><span class="macro-val">142g</span></div>
+      <div class="macro-row"><span class="macro-label">Carbs</span><div class="macro-bar"><div class="macro-fill" style="width:55%"></div></div><span class="macro-val">210g</span></div>
+      <div class="macro-row"><span class="macro-label">Grasa</span><div class="macro-bar"><div class="macro-fill" style="width:65%"></div></div><span class="macro-val">68g</span></div>
+      <div class="macro-row"><span class="macro-label">Fibra</span><div class="macro-bar"><div class="macro-fill" style="width:90%"></div></div><span class="macro-val">32g</span></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:var(--mono);font-size:1.25rem;font-weight:500;color:var(--accent)">2,085 / 2,100 kcal</span>
+        <span style="font-size:0.8rem;color:var(--success);font-weight:600">✓ En objetivo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing" style="background:var(--bg2)">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <span class="badge">Precios</span>
+      <h2 class="section-title">Come mejor por menos de lo que crees</h2>
+      <p class="section-sub" style="margin:0 auto">Empieza gratis. Escala cuando necesites más.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="card price-card reveal">
+        <h3 style="font-size:1.1rem;font-weight:600">Basic</h3>
+        <p style="color:var(--t3);font-size:0.875rem">Para explorar</p>
+        <div class="price-amount">€0<span>/mes</span></div>
+        <ul class="price-features">
+          <li>Plan semanal básico</li>
+          <li>10 recetas/semana</li>
+          <li>Tracking de calorías</li>
+        </ul>
+        <a href="#" class="btn btn-secondary" style="width:100%">Empezar Gratis</a>
+      </div>
+      <div class="card price-card popular reveal">
+        <div class="popular-tag">Más Popular</div>
+        <h3 style="font-size:1.1rem;font-weight:600">Premium</h3>
+        <p style="color:var(--t3);font-size:0.875rem">Para resultados</p>
+        <div class="price-amount">€14<span>/mes</span></div>
+        <ul class="price-features">
+          <li>Planificación IA completa</li>
+          <li>Recetas ilimitadas</li>
+          <li>Macros y micros</li>
+          <li>Lista de compras auto</li>
+          <li>Soporte prioritario</li>
+        </ul>
+        <a href="#" class="btn btn-primary" style="width:100%">Elegir Premium</a>
+      </div>
+      <div class="card price-card reveal">
+        <h3 style="font-size:1.1rem;font-weight:600">Family</h3>
+        <p style="color:var(--t3);font-size:0.875rem">Para toda la familia</p>
+        <div class="price-amount">€29<span>/mes</span></div>
+        <ul class="price-features">
+          <li>Todo de Premium</li>
+          <li>Hasta 6 miembros</li>
+          <li>Planes individuales</li>
+          <li>Compras compartidas</li>
+          <li>Modo niños</li>
+        </ul>
+        <a href="#" class="btn btn-warm" style="width:100%">Elegir Family</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <span class="badge">FAQ</span>
+      <h2 class="section-title">Preguntas frecuentes</h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item reveal"><button class="faq-q">¿FoodieBox es un servicio de reparto de comida?</button><div class="faq-a">No. FoodieBox es 100% digital: planificación de comidas con IA, recetas personalizadas, lista de compras automática y tracking nutricional. No repartimos comida física.</div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Cómo genera la IA mis planes de comida?</button><div class="faq-a">Nuestro algoritmo analiza tus objetivos, preferencias, alergias y datos nutricionales para crear planes personalizados que evolucionan contigo.</div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Puedo usarlo gratis?</button><div class="faq-a">Sí, el plan Basic es gratis para siempre con funciones limitadas. Premium desbloquea todo el potencial de la IA.</div></div>
+      <div class="faq-item reveal"><button class="faq-q">¿Funciona para dietas especiales?</button><div class="faq-a">Sí: keto, vegana, mediterránea, sin gluten, alta en proteína y muchas más. La IA se adapta a cualquier restricción.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-section reveal">
+      <h2 class="section-title" style="font-size:clamp(1.4rem,3vw,2rem)">¿Listo a comer mejor?</h2>
+      <p class="section-sub" style="margin:0 auto 32px">Empieza gratis. Tu primer plan nutricional en 2 minutos.</p>
+      <a href="#" class="btn btn-primary">Crear Mi Plan Gratis →</a>
+    </div>
+  </div>
+</footer>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div style="font-family:var(--serif);font-weight:700;color:var(--accent)">🥗 FoodieBox</div>
+      <div style="display:flex;gap:20px"><a href="#">Blog</a><a href="#">Privacidad</a><a href="#">Términos</a><a href="#">Contacto</a></div>
+      <div>© 2026 FoodieBox</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+reveals.forEach(r => observer.observe(r));
+
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+    const ans = btn.nextElementSibling;
+    ans.classList.toggle('open');
+    ans.style.maxHeight = ans.classList.contains('open') ? ans.scrollHeight + 'px' : '0';
+  });
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Animate macro bars on scroll
+const macroBars = document.querySelectorAll('.macro-fill');
+const macroObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const bar = e.target;
+      const width = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => { bar.style.width = width; }, 200);
+    }
+  });
+}, { threshold: 0.5 });
+macroBars.forEach(b => macroObserver.observe(b));
+</script>
+</body>
+</html>
